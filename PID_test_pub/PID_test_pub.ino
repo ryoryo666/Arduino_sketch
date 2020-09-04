@@ -11,7 +11,7 @@ std_msgs::Float32 vol;
 ros::Publisher chatter("Volume", &vol);
 
 bool LED;
-float duty = 0;
+float duty = 0.0;
 float dt, preTime;
 float P, I, D, preP;
 
@@ -32,6 +32,13 @@ void loop(){
   }
   vol.data=5.0*(vol.data/1000)/1024;
   
+  PID();
+  
+  chatter.publish(&vol);
+  nh.spinOnce();
+}
+
+void PID(){
   dt = (micros() - preTime) / 1000000;
   preTime = micros();
   P  = Target - vol.data;
@@ -40,7 +47,4 @@ void loop(){
   preP = P;
 
   duty += Kp * P + Ki * I + Kd * D;
-  
-  chatter.publish(&vol);
-  nh.spinOnce();
 }
