@@ -23,5 +23,4 @@ void loop()
   pulse_msg.data = digitalRead(2);
   chatter.publish( &pulse_msg );
   nh.spinOnce();
-  delay(100);
 }
