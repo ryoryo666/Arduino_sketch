@@ -1,5 +1,5 @@
 #include <ros.h>
-#include <std_msgs/Float32.h>
+#include <two_wheel/PID.h>
 
 #define Kp 30
 #define Ki 300
@@ -7,34 +7,43 @@
 #define Target 2.5
 
 ros::NodeHandle nh;
-std_msgs::Float32 vol;
+two_wheel::PID vol;
 ros::Publisher chatter("Volume", &vol);
 
-bool LED;
 float duty = 0.0;
 float dt, preTime;
 float P, I, D, preP;
 
 void setup(){
   pinMode(3, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(4, INPUT);
   
   nh.initNode();
   nh.advertise(chatter);
   
-  digitalWrite(13, LED);
+  while(digitalRead(4)==LOW){
+    digitalWrite(7,HIGH);
+  }
+  vol.time=0.0;
+  vol.data=0.0;
   preTime=micros();
+  chatter.publish(&vol);
+  digitalWrite(7,LOW);
 }
 
 void loop(){
+  static float startTime=preTime;
   analogWrite(3, duty);
   for(int i=0; i<1000; i++){
     vol.data+=analogRead(0);
   }
   vol.data=5.0*(vol.data/1000)/1024;
+  vol.time=micros()-startTime;
+  chatter.publish(&vol);
   
   PID();
-  
-  chatter.publish(&vol);
+
   nh.spinOnce();
 }
 
