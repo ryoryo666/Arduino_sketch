@@ -7,17 +7,17 @@
 #define start 4
 #define motor_pwm 11
 #define LED 7
-#define m1 12
+#define m1 13
 //Parameter
-#define Kp 1
+#define Kp 1.5
 #define Ki 0
-#define Kd 0
+#define Kd 0.1
 #define Target 20
 
 float duty = 0.0;
 float dt, preTime;
 float P, I, D, preP;
-volatile int cntA=0, cntB=0.0;
+volatile int encoderCnt=0;
 
 ros::NodeHandle nh;
 two_wheel::PID msg;
@@ -34,7 +34,6 @@ void setup(){
   pinMode(m1, OUTPUT);
   digitalWrite(m1, HIGH);
   attachInterrupt(0, A, CHANGE);
-  attachInterrupt(1, B, CHANGE);
   
   nh.initNode();
   nh.advertise(chatter);
@@ -50,7 +49,7 @@ void setup(){
 void loop(){
   static float startTime=preTime;
   analogWrite(motor_pwm, duty);
-  msg.data=(float)(cntA+cntB)/2592*600;
+  msg.data=(float)(cntA+cntB)/1296*600;
   msg.time=micros()-startTime;
   cntA=0.0;
   cntB=0.0;
@@ -63,11 +62,11 @@ void loop(){
 }
 
 void A(){
-  cntA++;
-}
-
-void B(){
-  cntB++;
+  if(digitalRead(encoderA)==digitalRead(encoderB)){
+    encoderCnt++;
+  }else{
+    encoderCnt--;
+  }
 }
 
 void PID(){
