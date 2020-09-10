@@ -10,17 +10,18 @@
 #define motor_pwm 11
 #define LED 7
 #define m1 13
+
 //Parameter
-float Kp=1.0;
+float Kp=0.18;
 float Ki=0.0;
-float Kd=0.5;
+float Kd=0.085;
 
 float Target=30;
 float last_data=0.0;
 float alpha=0.01;
 
 float duty = 0.0;
-float dt, preTime,startTime;
+float dt, preTime;
 float P, I, D, preP=0;
 int i=0;
 volatile int encoderCnt=0;
@@ -42,7 +43,7 @@ void setup(){
   digitalWrite(encoderA, HIGH);
   digitalWrite(encoderB, HIGH);
   pinMode(start, INPUT);
-  digitalWrite(m1, LOW);  
+  digitalWrite(m1, HIGH);  
   attachInterrupt(0, A, CHANGE);
   
   nh.initNode();
@@ -57,7 +58,7 @@ void setup(){
   Timer1.attachInterrupt(wakeup,10000);
   
   preTime=micros();
-  startTime=preTime;
+  //startTime=preTime;
 }
 
 void loop(){
@@ -65,11 +66,13 @@ void loop(){
 }
 
 void wakeup(){
+  static float startTime=micros();
   msg.data=(float)encoderCnt/1296*6000; //  [r/0.01s] * [6000]  =  [rpm]
   msg.data=alpha*msg.data+(1-alpha)*last_data;
   encoderCnt=0;
   if(i==10){
     msg.time=micros()-startTime;
+    //msg.time=duty*1000000;
     chatter.publish(&msg);
     i=0;
   }
@@ -86,11 +89,14 @@ void PID(){
   dt = (micros() - preTime) / 1000000;
   preTime = micros();
   P  = Target - msg.data;
-  I += P * dt;
+  I += (P + preP)* dt;
   D  = (P - preP) / dt;
   preP = P;
 
   duty += Kp * P + Ki * I + Kd * D;
+  if(duty<0){
+    duty=0;
+  }
 }
 
 void A(){
