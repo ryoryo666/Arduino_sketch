@@ -13,10 +13,10 @@
 
 //Parameter
 float Kp=0.18;
-float Ki=0.0;
+//float Ki=0.0;
 float Kd=0.085;
 
-float Target=30;
+float Target=0;
 float last_data=0.0;
 float alpha=0.01;
 
@@ -31,11 +31,11 @@ ros::NodeHandle nh;
 void messageCb(const std_msgs::Float32& new_target){
   Target=new_target.data;
 }
-ros::Subscriber<std_msgs::Float32> sub("target_update", &messageCb);
+ros::Subscriber<std_msgs::Float32> sub("Left_wheel_target_update", &messageCb);
 
 //  Publisher setting
 two_wheel::PID msg;
-ros::Publisher chatter("rpm_data", &msg);
+ros::Publisher chatter("Left_wheel_rpm_data", &msg);
 
 void setup(){
   pinMode(encoderA, INPUT);
@@ -89,11 +89,15 @@ void PID(){
   dt = (micros() - preTime) / 1000000;
   preTime = micros();
   P  = Target - msg.data;
-  I += (P + preP)* dt;
-  D  = (P - preP) / dt;
+  //I += (P + preP)* dt;
+  if(P < -15){
+    D  = (P - preP) ;
+  }else{
+    D  = (P - preP) / dt;
+  }
   preP = P;
 
-  duty += Kp * P + Ki * I + Kd * D;
+  duty += Kp * P +/* Ki * I +*/ Kd * D;
   if(duty<0){
     duty=0;
   }
