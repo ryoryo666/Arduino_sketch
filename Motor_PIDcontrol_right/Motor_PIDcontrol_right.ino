@@ -16,7 +16,7 @@ float Kp=0.18;
 //float Ki=0.0;
 float Kd=0.085;
 
-float Target=0;
+float Target=30.0;
 float last_data=0.0;
 float alpha=0.01;
 
@@ -24,12 +24,14 @@ float duty = 0.0;
 float dt, preTime;
 float P, I, D, preP=0;
 int i=0;
+int flag=0;
 volatile int encoderCnt=0;
 
 ros::NodeHandle nh;
 //  Subscriber setting
 void messageCb(const std_msgs::Float32& new_target){
   Target=new_target.data;
+  flag=1;
 }
 ros::Subscriber<std_msgs::Float32> sub("Right_wheel_target_update", &messageCb);
 
@@ -54,6 +56,9 @@ void setup(){
     digitalWrite(LED,HIGH);
   }
   digitalWrite(LED,LOW);
+  msg.data=0.0;
+  msg.time=0.0;
+  chatter.publish(&msg);
   Timer1.initialize();
   Timer1.attachInterrupt(wakeup,10000);
   
