@@ -12,9 +12,9 @@
 #define m1 13
 
 //Parameter
-float Kp=0.18;
+float Kp=2.0;
 //float Ki=0.0;
-float Kd=0.085;
+float Kd=1.1;
 
 float Target=30.0;
 float last_data=0.0;

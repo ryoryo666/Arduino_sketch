@@ -16,7 +16,7 @@ float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float Target=30.0;
+float Target=60.0;
 float last_data=0.0;
 float alpha=0.01;
 
@@ -33,11 +33,11 @@ void messageCb(const std_msgs::Float32& new_target){
   Target=new_target.data;
   flag=1;
 }
-ros::Subscriber<std_msgs::Float32> sub("Left_wheel_target_update", &messageCb);
+ros::Subscriber<std_msgs::Float32> sub("target_update", &messageCb);
 
 //  Publisher setting
 two_wheel::PID msg;
-ros::Publisher chatter("Left_wheel_rpm_data", &msg);
+ros::Publisher chatter("rpm_data", &msg);
 
 void setup(){
   pinMode(encoderA, INPUT);
