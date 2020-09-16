@@ -1,11 +1,15 @@
 #include <ros.h>
 #include <two_wheel/PID.h>
 
+// Gain
 #define Kp 30
 #define Ki 300
 #define Kd 0.1
+
+// Target Value
 #define Target 2.5
 
+// ROS setting
 ros::NodeHandle nh;
 two_wheel::PID vol;
 ros::Publisher chatter("Volume", &vol);
