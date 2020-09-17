@@ -5,11 +5,13 @@
 
 //Pin number
 #define R_encoderA 2
-#define R_encoderB 3
-#define start 4
+#define R_encoderB 4
+#define L_encoderA 3
+#define L_encoderB 5
+#define start 
 #define motor_pwm 11
-#define LED 7
-#define m1 13
+#define LED 
+#define m1 
 
 //Parameter
 float Kp=2.0;
@@ -26,6 +28,7 @@ float r_P, r_I, r_D, r_preP=0;
 int r_i=0, l_i=0;
 int flag=0;
 volatile int r_encoderCnt=0;
+volatile int l_encoderCnt=0;
 
 ros::NodeHandle nh;
 //  Subscriber setting
