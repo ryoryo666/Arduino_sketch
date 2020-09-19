@@ -9,22 +9,29 @@
 #define L_encoderA 3
 #define L_encoderB 5
 #define start 
-#define motor_pwm 11
+#define r_motor_pwm 
+#define l_motor_pwm 
 #define LED 
 #define m1 
+#define m2
 
 //Parameter
 float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float r_Target=60.0;
-float r_last_data=0.0;
-float alpha=0.01;
+float r_Target = 60.0;
+float l_Target = 60.0;
+float r_last_data = 0.0;
+float l_last_data = 0.0;
+float alpha = 0.01;
 
 float r_duty = 0.0;
+float l_duty = 0.0;
 float r_dt, r_preTime;
-float r_P, r_I, r_D, r_preP=0;
+float l_dt, l_preTime;
+float r_P, r_I, r_D, r_preP = 0;
+float l_P, r_I, l_D, l_preP = 0;
 int r_i=0, l_i=0;
 int flag=0;
 volatile int r_encoderCnt=0;
@@ -47,9 +54,16 @@ void setup(){
   pinMode(R_encoderB, INPUT);
   digitalWrite(R_encoderA, HIGH);
   digitalWrite(R_encoderB, HIGH);
+  pinMode(L_encoderA, INPUT);
+  pinMode(L_encoerrB, INPUT);
+  digitalWrite(L_encoderA, HIGH);
+  digitalWrite(L_encoderB, HIGH);
+  
   pinMode(start, INPUT);
   digitalWrite(m1, HIGH);  
+  digitalWrite(m2, LOW);
   attachInterrupt(0, Right_Motor, CHANGE);
+  attachInterrupt(1, Left_Motor, CHANGE);
   
   nh.initNode();
   nh.advertise(chatter);
