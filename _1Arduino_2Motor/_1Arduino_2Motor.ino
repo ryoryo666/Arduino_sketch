@@ -8,12 +8,14 @@
 #define R_encoderB 4
 #define L_encoderA 3
 #define L_encoderB 5
-#define start 
-#define r_motor_pwm 
-#define l_motor_pwm 
-#define LED 
-#define m1 
-#define m2
+#define start 6
+#define r_motor_pwm 10
+#define l_motor_pwm 11
+//#define LED 
+#define m1_IN1 8 
+#define m1_IN2 9
+#define m2_IN1 12
+#define m2_IN2 13
 
 //Parameter
 float Kp=2.0;
@@ -60,8 +62,10 @@ void setup(){
   digitalWrite(L_encoderB, HIGH);
   
   pinMode(start, INPUT);
-  digitalWrite(m1, HIGH);  
-  digitalWrite(m2, LOW);
+  digitalWrite(m1_IN1, HIGH);  
+  digitalWrite(m1_IN2, LOW);
+  digitalWrite(m2_IN1, LOW);
+  digitalWrite(m2_IN2, HIGH);
   attachInterrupt(0, Right_Motor, CHANGE);
   attachInterrupt(1, Left_Motor, CHANGE);
   
