@@ -8,14 +8,12 @@
 #define R_encoderB 4
 #define L_encoderA 3
 #define L_encoderB 5
-#define start 6
-#define r_motor_pwm 10
+#define start 8
+#define r_motor_pwm 6
 #define l_motor_pwm 11
 #define LED 7
-#define m1_IN1 12
-#define m1_IN2 13
-#define m2_IN1 8
-#define m2_IN2 9
+#define IN1 12
+#define IN2 13
 
 //Parameter
 float Kp=2.0;
@@ -62,10 +60,8 @@ void setup(){
   digitalWrite(L_encoderB, HIGH);
   
   pinMode(start, INPUT);
-  digitalWrite(m1_IN1, HIGH);  
-  digitalWrite(m1_IN2, LOW);
-  digitalWrite(m2_IN1, LOW);  
-  digitalWrite(m2_IN2, HIGH);
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, LOW);
   attachInterrupt(0, Right_Motor, CHANGE);
   attachInterrupt(1, Left_Motor, CHANGE);
   
@@ -175,4 +171,17 @@ void Left_Motor(){
   }else{
     l_encoderCnt++;
   }
+}
+
+void CW(){
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, LOW);
+}
+void CCW(){
+  digitalWrite(IN1, LOW);  
+  digitalWrite(IN2, HIGH);
+}
+void STOP(){
+  digitalWrite(IN1, LOW);  
+  digitalWrite(IN2, LOW);
 }
