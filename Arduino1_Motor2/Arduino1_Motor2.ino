@@ -1,5 +1,6 @@
 #include <ros.h>
 #include <two_wheel/PID.h>
+#include <two_wheel/target_curve.h>
 #include <TimerOne.h>
 #include <std_msgs/Float32.h>
 
@@ -20,8 +21,8 @@ float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float r_Target = 60.0;
-float l_Target = 20.0;
+float r_Target = 0.0;
+float l_Target = 0.0;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
 float alpha = 0.01;
@@ -39,11 +40,12 @@ volatile int l_encoderCnt=0;
 
 ros::NodeHandle nh;
 //  Subscriber setting
-void messageCb(const std_msgs::Float32& new_target){
-  r_Target=new_target.data;
+void messageCb(const two_wheel::target_curve& new_target){
+  r_Target=new_target.r_target;
+  l_Target=new_target.l_target;
   flag=1;
 }
-ros::Subscriber<std_msgs::Float32> sub("target_update", &messageCb);
+ros::Subscriber<two_wheel::target_curve> sub("target_update", &messageCb);
 
 //  Publisher setting
 two_wheel::PID msg;

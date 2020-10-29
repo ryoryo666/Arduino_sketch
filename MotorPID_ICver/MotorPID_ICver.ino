@@ -3,11 +3,11 @@
 //Pin number
 #define encoderA 2
 #define encoderB 4
-#define start 6
+#define start 8
 #define motor_pwm 11
 #define LED 7
-#define m2_IN1 12
-#define m2_IN2 13
+#define IN1 12
+#define IN2 13
 
 //Parameter
 float Kp=2.0;
@@ -32,8 +32,8 @@ void setup(){
   pinMode(encoderB, INPUT);
   digitalWrite(encoderA, HIGH);
   digitalWrite(encoderB, HIGH);
-  digitalWrite(m2_IN1, HIGH);  
-  digitalWrite(m2_IN2, LOW); 
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, LOW); 
   attachInterrupt(0, A, CHANGE);
   
   while(digitalRead(start)==LOW){
