@@ -1,7 +1,6 @@
 #include <ros.h>
 #include <two_wheel/PID.h>
 #include <two_wheel/target_curve.h>
-#include <std_msgs/Float32.h>
 
 //Pin number
 #define R_encoderA 2
@@ -25,7 +24,6 @@ float l_Target = 0.0;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
 float alpha = 0.01;
-float pi = 3.14;
 
 float r_duty = 0.0;
 float l_duty = 0.0;
@@ -33,8 +31,6 @@ float r_dt, r_preTime;
 float l_dt, l_preTime;
 float r_P, r_I, r_D, r_preP = 0;
 float l_P, l_I, l_D, l_preP = 0;
-int i=0;
-int flag=0;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
 
@@ -43,7 +39,6 @@ ros::NodeHandle nh;
 void messageCb(const two_wheel::target_curve& new_target){
   r_Target=new_target.r_target;
   l_Target=new_target.l_target;
-  flag=1;
 }
 ros::Subscriber<two_wheel::target_curve> sub("target_update", &messageCb);
 
@@ -83,17 +78,17 @@ void setup(){
 
 void loop(){
   static float startTime=micros();
-  msg.r_data=((float)r_encoderCnt/(12*54*2))*2*pi*100; //  [rad/0.01s] * [100]  =  [rad/s]
+  static int i=0;
+  msg.r_data=((float)r_encoderCnt/(12*54*2))*2*3.14*100; //  [rad/0.01s] * [100]  =  [rad/s]
   msg.r_data=alpha*msg.r_data+(1-alpha)*r_last_data;
-  msg.l_data=((float)l_encoderCnt/(12*54*2))*2*pi*100; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.l_data=((float)l_encoderCnt/(12*54*2))*2*3.14*100; //  [rad/0.01s] * [100]  =  [rad/s]
   msg.l_data=alpha*msg.l_data+(1-alpha)*l_last_data;
   
   r_encoderCnt=0;
   l_encoderCnt=0;
   
   if(i==10){
-    msg.r_time=micros()-startTime;
-    msg.l_time=msg.r_time;
+    msg.time=micros()-startTime;
     chatter.publish(&msg);
     i=0;
   }

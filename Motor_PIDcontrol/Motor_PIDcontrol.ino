@@ -6,10 +6,11 @@
 //Pin number
 #define encoderA 2
 #define encoderB 3
-#define start 4
+#define start 8
 #define motor_pwm 11
 #define LED 7
-#define m1 13
+#define IN1 12
+#define IN2 13
 
 //Parameter
 float Kp=2.0;
@@ -45,7 +46,8 @@ void setup(){
   digitalWrite(encoderA, HIGH);
   digitalWrite(encoderB, HIGH);
   pinMode(start, INPUT);
-  digitalWrite(m1, HIGH);  
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, LOW); 
   attachInterrupt(0, A, CHANGE);
   
   nh.initNode();
@@ -56,7 +58,7 @@ void setup(){
     digitalWrite(LED,HIGH);
   }
   digitalWrite(LED,LOW);
-  msg.data=0.0;
+  msg.r_data=0.0;
   msg.time=0.0;
   chatter.publish(&msg);
   Timer1.initialize();
