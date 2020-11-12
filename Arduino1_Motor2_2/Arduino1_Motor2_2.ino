@@ -40,7 +40,7 @@ void messageCb(const two_wheel::target_curve& new_target){
   r_Target=new_target.r_target;
   l_Target=new_target.l_target;
 }
-ros::Subscriber<two_wheel::target_curve> sub("target_update", &messageCb);
+ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
 
 //  Publisher setting
 two_wheel::PID msg;
@@ -55,22 +55,22 @@ void setup(){
   pinMode(L_encoderB, INPUT);
   digitalWrite(L_encoderA, HIGH);
   digitalWrite(L_encoderB, HIGH);
-  
+
   pinMode(start, INPUT);
   digitalWrite(IN1, HIGH);  
   digitalWrite(IN2, LOW);
   attachInterrupt(0, Right_Motor, CHANGE);
   attachInterrupt(1, Left_Motor, CHANGE);
-  
+
   nh.initNode();
   nh.advertise(chatter);
   nh.subscribe(sub);
-  
+
   while(digitalRead(start)==LOW){
     digitalWrite(LED,LOW);
   }
   digitalWrite(LED,HIGH);
-  
+
   r_preTime=micros();
   l_preTime=r_preTime;
   //startTime=r_preTime;
@@ -83,32 +83,32 @@ void loop(){
   msg.r_data=alpha*msg.r_data+(1-alpha)*r_last_data;
   msg.l_data=((float)l_encoderCnt/(12*54*2))*2*3.14*100; //  [rad/0.01s] * [100]  =  [rad/s]
   msg.l_data=alpha*msg.l_data+(1-alpha)*l_last_data;
-  
+
   r_encoderCnt=0;
   l_encoderCnt=0;
-  
+
   if(i==10){
-    msg.time=micros()-startTime;
+    //    msg.time=micros()-startTime;
     chatter.publish(&msg);
     i=0;
   }
-  
+
   R_PID();
   L_PID();
-  
+
   if(r_duty>250){
     r_duty=250;
   }
   if(l_duty>250){
     l_duty=250;
   }
-  
+
   analogWrite(r_motor_pwm, r_duty);
   analogWrite(l_motor_pwm, l_duty);
   r_last_data=msg.r_data;
   l_last_data=msg.l_data;
   i++;
-  
+
   nh.spinOnce();
   delay(10);
 }
@@ -121,7 +121,8 @@ void R_PID(){
   //r_I += (r_P + r_preP)* r_dt;
   if(r_P < -15){
     r_D  = (r_P - r_preP) ;
-  }else{
+  }
+  else{
     r_D  = (r_P - r_preP) / r_dt;
   }
   r_preP = r_P;
@@ -139,7 +140,8 @@ void L_PID(){
   //r_I += (r_P + r_preP)* r_dt;
   if(l_P < -15){
     l_D  = (l_P - l_preP) ;
-  }else{
+  }
+  else{
     l_D  = (l_P - l_preP) / l_dt;
   }
   l_preP = l_P;
@@ -154,7 +156,8 @@ void L_PID(){
 void Right_Motor(){
   if(digitalRead(R_encoderA)==digitalRead(R_encoderB)){
     r_encoderCnt++;
-  }else{
+  }
+  else{
     r_encoderCnt++;
   }
 }
@@ -162,8 +165,8 @@ void Right_Motor(){
 void Left_Motor(){
   if(digitalRead(L_encoderA)==digitalRead(L_encoderB)){
     l_encoderCnt++;
-  }else{
+  }
+  else{
     l_encoderCnt++;
   }
 }
-

@@ -45,7 +45,7 @@ void messageCb(const two_wheel::target_curve& new_target){
   l_Target=new_target.l_target;
   flag=1;
 }
-ros::Subscriber<two_wheel::target_curve> sub("target_update", &messageCb);
+ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
 
 //  Publisher setting
 two_wheel::PID msg;
@@ -99,8 +99,7 @@ void wakeup(){
   l_encoderCnt=0;
   
   if(i==10){
-    msg.r_time=micros()-startTime;
-    msg.l_time=msg.r_time;
+    msg.time=micros()-startTime;
     chatter.publish(&msg);
     i=0;
   }
