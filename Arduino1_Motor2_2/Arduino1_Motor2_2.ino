@@ -7,12 +7,13 @@
 #define R_encoderB 4
 #define L_encoderA 3
 #define L_encoderB 5
-#define start 8
 #define r_motor_pwm 6
 #define l_motor_pwm 11
 #define LED 7
+#define start 8
 #define IN1 12
 #define IN2 13
+
 
 //Parameter
 float Kp=2.0;
@@ -23,7 +24,6 @@ float r_Target = 0.0;
 float l_Target = 0.0;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
-float alpha = 0.01;
 
 float r_duty = 0.0;
 float l_duty = 0.0;
@@ -66,29 +66,32 @@ void setup(){
   nh.advertise(chatter);
   nh.subscribe(sub);
 
+  //  LED
   while(digitalRead(start)==LOW){
     digitalWrite(LED,LOW);
   }
   digitalWrite(LED,HIGH);
+  msg.r_data=0.0;
+  msg.l_data=0.0;
+  chatter.publish(&msg);
 
   r_preTime=micros();
   l_preTime=r_preTime;
-  //startTime=r_preTime;
 }
 
 void loop(){
-  static float startTime=micros();
   static int i=0;
-  msg.r_data=((float)r_encoderCnt/(12*54*2))*2*3.14*100; //  [rad/0.01s] * [100]  =  [rad/s]
-  msg.r_data=alpha*msg.r_data+(1-alpha)*r_last_data;
-  msg.l_data=((float)l_encoderCnt/(12*54*2))*2*3.14*100; //  [rad/0.01s] * [100]  =  [rad/s]
-  msg.l_data=alpha*msg.l_data+(1-alpha)*l_last_data;
+  static float startTime=micros();
+  msg.r_data=((float)r_encoderCnt/(12*54*2))*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.l_data=((float)l_encoderCnt/(12*54*2))*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
+  msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
+  msg.time=(micros()-startTime)/1000000.0;
 
   r_encoderCnt=0;
   l_encoderCnt=0;
 
   if(i==10){
-    //    msg.time=micros()-startTime;
     chatter.publish(&msg);
     i=0;
   }
