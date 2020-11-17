@@ -4,10 +4,10 @@
 #include <std_msgs/Float32.h>
 
 //Pin number
-#define encoderA 2
-#define encoderB 3
+#define encoderA 3
+#define encoderB 5
 #define start 8
-#define motor_pwm 11
+#define motor_pwm 6
 #define LED 7
 #define IN1 12
 #define IN2 13
@@ -17,7 +17,7 @@ float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float Target=60.0;
+float Target=20.0;
 float last_data=0.0;
 float alpha=0.01;
 

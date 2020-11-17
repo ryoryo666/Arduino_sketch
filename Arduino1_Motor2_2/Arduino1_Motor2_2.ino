@@ -7,8 +7,8 @@
 #define R_encoderB 4
 #define L_encoderA 3
 #define L_encoderB 5
-#define r_motor_pwm 6
-#define l_motor_pwm 11
+#define r_motor_pwm 11
+#define l_motor_pwm 6
 #define LED 7
 #define start 8
 #define IN1 12
@@ -20,7 +20,7 @@ float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float r_Target = 0.0;
+float r_Target = 10.0;
 float l_Target = 0.0;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
@@ -82,11 +82,11 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  msg.r_data=((float)r_encoderCnt/(12*54*2))*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
-  msg.l_data=((float)l_encoderCnt/(12*54*2))*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.r_data=(float)r_encoderCnt/(12*54*2)*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.l_data=(float)l_encoderCnt/(12*54*2)*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
   msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
   msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
-  msg.time=(micros()-startTime)/1000000.0;
+  msg.time=(micros()-startTime)/1000000;
 
   r_encoderCnt=0;
   l_encoderCnt=0;
@@ -122,12 +122,7 @@ void R_PID(){
   r_preTime = micros();
   r_P  = r_Target - msg.r_data;
   //r_I += (r_P + r_preP)* r_dt;
-  if(r_P < -15){
-    r_D  = (r_P - r_preP) ;
-  }
-  else{
-    r_D  = (r_P - r_preP) / r_dt;
-  }
+  r_D  = (r_P - r_preP) / r_dt;
   r_preP = r_P;
 
   r_duty += Kp * r_P +/* Ki * I +*/ Kd * r_D;
