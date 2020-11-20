@@ -20,7 +20,7 @@ float Kp=2.0;
 //float Ki=0.0;
 float Kd=1.1;
 
-float r_Target = 10.0;
+float r_Target = 0.0;
 float l_Target = 0.0;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
