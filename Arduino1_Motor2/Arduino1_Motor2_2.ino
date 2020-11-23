@@ -1,5 +1,5 @@
 #include <ros.h>
-#include <two_wheel/PID.h>
+#include <two_wheel/RPM2_Time.h>
 #include <two_wheel/target_curve.h>
 
 //Pin number
@@ -43,7 +43,7 @@ void messageCb(const two_wheel::target_curve& new_target){
 ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
 
 //  Publisher setting
-two_wheel::PID msg;
+two_wheel::RPM2_Time msg;
 ros::Publisher chatter("rpm_data", &msg);
 
 void setup(){

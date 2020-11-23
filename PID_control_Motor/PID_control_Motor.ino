@@ -1,5 +1,3 @@
-#include <TimerOne.h>
-
 //Pin number
 #define encoderA 3
 #define encoderB 5
@@ -39,20 +37,13 @@ void setup(){
     digitalWrite(LED,LOW);
   }
   digitalWrite(LED,HIGH);
-  Timer1.initialize();
-  Timer1.attachInterrupt(wakeup,10000);
   Serial.begin(9600);
   
   preTime=micros();
-  //startTime=preTime;
 }
+
 
 void loop(){
-  Serial.println(data);
-  delay(100);
-}
-
-void wakeup(){
   static float startTime=micros();
   data=(float)encoderCnt/648*6000; //  [r/0.01s] * [6000]  =  [rpm]
   data=alpha*data+(1-alpha)*last_data;
@@ -62,23 +53,21 @@ void wakeup(){
     duty=250;
   }
   analogWrite(motor_pwm,duty);
+  Serial.println(data);
   last_data=data;
   i++;
 }
+
 
 void PID(){
   dt = (micros() - preTime) / 1000000;
   preTime = micros();
   P  = Target - data;
   I += (P + preP)* dt;
-  if(P < -15){
-    D  = (P - preP) ;
-  }else{
-    D  = (P - preP) / dt;
-  }
+  D  = (P - preP) / dt;
   preP = P;
 
-  duty += Kp * P +/* Ki * I +*/ Kd * D;
+  duty += Kp * P + Ki * I + Kd * D;
   if(duty<0){
     duty=0;
   }

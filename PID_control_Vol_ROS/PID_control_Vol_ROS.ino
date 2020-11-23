@@ -1,5 +1,5 @@
 #include <ros.h>
-#include <two_wheel/PID.h>
+#include <two_wheel/RPM1_Time.h>
 
 // Gain
 #define Kp 30
@@ -9,13 +9,13 @@
 // Target Value
 #define Target 2.5
 
-// ROS setting
+// ROS
 ros::NodeHandle nh;
-two_wheel::PID vol;
+two_wheel::RPM1_Time vol;
 ros::Publisher chatter("Volume", &vol);
 
 float duty = 0.0;
-float dt, preTime;
+float dt, preTime,startTime;
 float P, I, D, preP;
 
 void setup(){
@@ -29,21 +29,19 @@ void setup(){
   while(digitalRead(4)==LOW){
     digitalWrite(7,HIGH);
   }
-  vol.time=0.0;
-  vol.data=0.0;
-  preTime=micros();
-  chatter.publish(&vol);
   digitalWrite(7,LOW);
+  
+  preTime=micros();
+  startTime=preTime;
 }
 
 void loop(){
-  static float startTime=preTime;
   analogWrite(3, duty);
   for(int i=0; i<1000; i++){
     vol.data+=analogRead(0);
   }
   vol.data=5.0*(vol.data/1000)/1024;
-  vol.time=micros()-startTime;
+  vol.time=micros() - startTime;
   chatter.publish(&vol);
   
   PID();
