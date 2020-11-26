@@ -31,6 +31,7 @@ float r_dt, r_preTime;
 float l_dt, l_preTime;
 float r_P, r_I, r_D, r_preP = 0;
 float l_P, l_I, l_D, l_preP = 0;
+int gear=250;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
 
@@ -65,12 +66,13 @@ void setup(){
   nh.initNode();
   nh.advertise(chatter);
   nh.subscribe(sub);
-
+/*
   //  LED
   while(digitalRead(start)==LOW){
     digitalWrite(LED,LOW);
   }
   digitalWrite(LED,HIGH);
+  */
   msg.r_data=0.0;
   msg.l_data=0.0;
   chatter.publish(&msg);
@@ -82,8 +84,8 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  msg.r_data=(float)r_encoderCnt/(12*54*2)*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
-  msg.l_data=(float)l_encoderCnt/(12*54*2)*100*60; //  [rad/0.01s] * [100]  =  [rad/s]
+  msg.r_data=(float)r_encoderCnt/(12*gear*2)*100*60;
+  msg.l_data=(float)l_encoderCnt/(12*gear*2)*100*60;
   msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
   msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
   msg.time=(micros()-startTime)/1000000;
