@@ -40,6 +40,11 @@ ros::NodeHandle nh;
 void messageCb(const two_wheel::target_curve& new_target){
   r_Target=new_target.r_target;
   l_Target=new_target.l_target;
+  if(r_Target < 0){
+    CCW();
+  } else if(r_Target > 0){
+    CW();
+  }
 }
 ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
 
@@ -58,7 +63,7 @@ void setup(){
   digitalWrite(L_encoderB, HIGH);
 
   pinMode(start, INPUT);
-  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN1, LOW);  
   digitalWrite(IN2, LOW);
   attachInterrupt(0, Right_Motor, CHANGE);
   attachInterrupt(1, Left_Motor, CHANGE);
@@ -84,8 +89,8 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  msg.r_data=(float)r_encoderCnt/(12*gear*2)*100*60;
-  msg.l_data=(float)l_encoderCnt/(12*gear*2)*100*60;
+  msg.r_data=(float)r_encoderCnt/(12*gear)*100*60;
+  msg.l_data=(float)l_encoderCnt/(12*gear)*100*60;
   msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
   msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
   msg.time=(micros()-startTime)/1000000;
@@ -169,4 +174,14 @@ void Left_Motor(){
   else{
     l_encoderCnt++;
   }
+}
+
+void CW(){
+  digitalWrite(IN1, LOW);  
+  digitalWrite(IN2, LOW);
+}
+
+void CCW(){
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, HIGH);
 }
