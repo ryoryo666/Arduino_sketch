@@ -16,9 +16,9 @@
 
 
 //Parameter
-float Kp=2.0;
+float Kp=6.0;
 //float Ki=0.0;
-float Kd=1.1;
+float Kd=2.0;
 
 float r_Target = 0.0;
 float l_Target = 0.0;
@@ -40,9 +40,11 @@ ros::NodeHandle nh;
 void messageCb(const two_wheel::target_curve& new_target){
   r_Target=new_target.r_target;
   l_Target=new_target.l_target;
-  if(r_Target < 0){
+  if(r_Target < 0 && l_Target < 0){
     CCW();
-  } else if(r_Target > 0){
+    r_Target = r_Target * -1;
+    l_Target = l_Target * -1;
+  } else{
     CW();
   }
 }
@@ -63,8 +65,8 @@ void setup(){
   digitalWrite(L_encoderB, HIGH);
 
   pinMode(start, INPUT);
-  digitalWrite(IN1, LOW);  
-  digitalWrite(IN2, LOW);
+  digitalWrite(IN1, HIGH);  
+  digitalWrite(IN2, HIGH);
   attachInterrupt(0, Right_Motor, CHANGE);
   attachInterrupt(1, Left_Motor, CHANGE);
 
@@ -78,9 +80,6 @@ void setup(){
   }
   digitalWrite(LED,HIGH);
   */
-  msg.r_data=0.0;
-  msg.l_data=0.0;
-  chatter.publish(&msg);
 
   r_preTime=micros();
   l_preTime=r_preTime;
@@ -98,23 +97,16 @@ void loop(){
   r_encoderCnt=0;
   l_encoderCnt=0;
 
-  if(i==10){
+  if(i==5){
     chatter.publish(&msg);
     i=0;
-  }
+  } 
 
   R_PID();
   L_PID();
 
-  if(r_duty>250){
-    r_duty=250;
-  }
-  if(l_duty>250){
-    l_duty=250;
-  }
-
-  analogWrite(r_motor_pwm, r_duty);
-  analogWrite(l_motor_pwm, l_duty);
+  analogWrite(r_motor_pwm, abs(r_duty));
+  analogWrite(l_motor_pwm, abs(l_duty));
   r_last_data=msg.r_data;
   l_last_data=msg.l_data;
   i++;
@@ -127,7 +119,7 @@ void loop(){
 void R_PID(){
   r_dt = (micros() - r_preTime) / 1000000;
   r_preTime = micros();
-  r_P  = r_Target - msg.r_data;
+  r_P  = r_Target - abs(msg.r_data);
   //r_I += (r_P + r_preP)* r_dt;
   r_D  = (r_P - r_preP) / r_dt;
   r_preP = r_P;
@@ -135,25 +127,24 @@ void R_PID(){
   r_duty += Kp * r_P +/* Ki * I +*/ Kd * r_D;
   if(r_duty<0){
     r_duty=0;
+  }else if(r_duty>250){
+    r_duty=250;
   }
 }
 
 void L_PID(){
   l_dt = (micros() - l_preTime) / 1000000;
   l_preTime = micros();
-  l_P  = l_Target - msg.l_data;
+  l_P  = l_Target - abs(msg.l_data);
   //r_I += (r_P + r_preP)* r_dt;
-  if(l_P < -15){
-    l_D  = (l_P - l_preP) ;
-  }
-  else{
-    l_D  = (l_P - l_preP) / l_dt;
-  }
+  l_D  = (l_P - l_preP) / l_dt;
   l_preP = l_P;
-
+ 
   l_duty += Kp * l_P +/* Ki * I +*/ Kd * l_D;
   if(l_duty<0){
     l_duty=0;
+  }else if(l_duty>250){
+    l_duty=250;
   }
 }
 
@@ -163,13 +154,13 @@ void Right_Motor(){
     r_encoderCnt++;
   }
   else{
-    r_encoderCnt++;
+    r_encoderCnt--;
   }
 }
 
 void Left_Motor(){
   if(digitalRead(L_encoderA)==digitalRead(L_encoderB)){
-    l_encoderCnt++;
+    l_encoderCnt--;
   }
   else{
     l_encoderCnt++;
