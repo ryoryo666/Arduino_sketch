@@ -9,8 +9,6 @@
 #define L_encoderB 5
 #define r_motor_pwm 11
 #define l_motor_pwm 6
-#define LED 7
-#define start 8
 #define IN1 12
 #define IN2 13
 
@@ -31,9 +29,9 @@ float r_dt, r_preTime;
 float l_dt, l_preTime;
 float r_P, r_I, r_D, r_preP = 0;
 float l_P, l_I, l_D, l_preP = 0;
-int gear=250;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
+boolean flag;
 
 ros::NodeHandle nh;
 //  Subscriber setting
@@ -42,9 +40,9 @@ void messageCb(const two_wheel::target_curve& new_target){
   l_Target=new_target.l_target;
   if(r_Target < 0 && l_Target < 0){
     CCW();
-    r_Target = r_Target * -1;
-    l_Target = l_Target * -1;
-  } else{
+  }else if(r_Target==0 || l_Target==0){
+    flag=false;
+  }else{
     CW();
   }
 }
@@ -64,7 +62,6 @@ void setup(){
   digitalWrite(L_encoderA, HIGH);
   digitalWrite(L_encoderB, HIGH);
 
-  pinMode(start, INPUT);
   digitalWrite(IN1, HIGH);  
   digitalWrite(IN2, HIGH);
   attachInterrupt(0, Right_Motor, CHANGE);
@@ -73,13 +70,6 @@ void setup(){
   nh.initNode();
   nh.advertise(chatter);
   nh.subscribe(sub);
-/*
-  //  LED
-  while(digitalRead(start)==LOW){
-    digitalWrite(LED,LOW);
-  }
-  digitalWrite(LED,HIGH);
-  */
 
   r_preTime=micros();
   l_preTime=r_preTime;
@@ -88,8 +78,8 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  msg.r_data=(float)r_encoderCnt/(12*gear)*100*60;
-  msg.l_data=(float)l_encoderCnt/(12*gear)*100*60;
+  msg.r_data=(float)r_encoderCnt/(12*250)*100*60;
+  msg.l_data=(float)l_encoderCnt/(12*250)*100*60;
   msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
   msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
   msg.time=(micros()-startTime)/1000000;
@@ -97,10 +87,9 @@ void loop(){
   r_encoderCnt=0;
   l_encoderCnt=0;
 
-  if(i==5){
+  if(i==10){
     chatter.publish(&msg);
-    i=0;
-  } 
+    }
 
   R_PID();
   L_PID();
@@ -170,9 +159,13 @@ void Left_Motor(){
 void CW(){
   digitalWrite(IN1, LOW);  
   digitalWrite(IN2, LOW);
+  flag=true;
 }
 
 void CCW(){
   digitalWrite(IN1, HIGH);  
   digitalWrite(IN2, HIGH);
+  r_Target = r_Target * -1;
+  l_Target = l_Target * -1;
+  flag=true;
 }

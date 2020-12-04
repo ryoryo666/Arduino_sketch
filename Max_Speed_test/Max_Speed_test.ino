@@ -42,14 +42,16 @@ void loop(){
   data_r=0.01*data_r+(1-0.01)*last_data_r;
   data_l=0.01*data_l+(1-0.01)*last_data_l;
 
-  r_encoderCnt=0;
-  l_encoderCnt=0;
-
   if(i==10){
-    Serial.print(data_l);
-    Serial.println(data_r);
+    Serial.print(l_encoderCnt);
+    Serial.print(" \t");
+    Serial.print(r_encoderCnt);
+    Serial.println(" ");
     i=0;
   }
+
+  r_encoderCnt=0;
+  l_encoderCnt=0;
 
   analogWrite(r_motor_pwm, 255);
   analogWrite(l_motor_pwm, 255);
