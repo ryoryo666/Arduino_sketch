@@ -89,6 +89,7 @@ void loop(){
 
   if(i==10){
     chatter.publish(&msg);
+    i=0;
     }
 
   R_PID();
