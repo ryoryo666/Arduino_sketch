@@ -31,7 +31,6 @@ float r_P, r_I, r_D, r_preP = 0;
 float l_P, l_I, l_D, l_preP = 0;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
-boolean flag;
 
 ros::NodeHandle nh;
 //  Subscriber setting
@@ -40,13 +39,12 @@ void messageCb(const two_wheel::target_curve& new_target){
   l_Target=new_target.l_target;
   if(r_Target < 0 && l_Target < 0){
     CCW();
-  }else if(r_Target==0 || l_Target==0){
-    flag=false;
   }else{
     CW();
   }
 }
 ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
+
 
 //  Publisher setting
 two_wheel::RPM2_Time msg;
@@ -80,23 +78,33 @@ void loop(){
   static float startTime=micros();
   msg.r_data=(float)r_encoderCnt/(12*250)*100*60;
   msg.l_data=(float)l_encoderCnt/(12*250)*100*60;
-  msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
-  msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
+  if (r_encoderCnt==0){
+    msg.r_data=0.05*msg.r_data+(1-0.05)*r_last_data;
+  }else{
+    msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
+  }
+  if (l_encoderCnt==0){
+    msg.l_data=0.05*msg.l_data+(1-0.05)*l_last_data;
+  }else{
+    msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;
+  }
+  
+  
   msg.time=(micros()-startTime)/1000000;
-
-  r_encoderCnt=0;
-  l_encoderCnt=0;
-
-  if(i==10){
-    chatter.publish(&msg);
-    i=0;
-    }
 
   R_PID();
   L_PID();
 
   analogWrite(r_motor_pwm, abs(r_duty));
   analogWrite(l_motor_pwm, abs(l_duty));
+
+  if(i==10){
+    chatter.publish(&msg);
+    i=0;
+    }
+    
+  r_encoderCnt=0;
+  l_encoderCnt=0;
   r_last_data=msg.r_data;
   l_last_data=msg.l_data;
   i++;
@@ -160,7 +168,6 @@ void Left_Motor(){
 void CW(){
   digitalWrite(IN1, LOW);  
   digitalWrite(IN2, LOW);
-  flag=true;
 }
 
 void CCW(){
@@ -168,5 +175,4 @@ void CCW(){
   digitalWrite(IN2, HIGH);
   r_Target = r_Target * -1;
   l_Target = l_Target * -1;
-  flag=true;
 }

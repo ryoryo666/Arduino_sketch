@@ -11,6 +11,7 @@
 #define IN2 13
 
 int gear=250;
+int duty=10;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
 
@@ -53,8 +54,8 @@ void loop(){
   r_encoderCnt=0;
   l_encoderCnt=0;
 
-  analogWrite(r_motor_pwm, 255);
-  analogWrite(l_motor_pwm, 255);
+  analogWrite(r_motor_pwm, duty);
+  analogWrite(l_motor_pwm, duty);
   last_data_r=data_r;
   last_data_l=data_l;
   i++;
