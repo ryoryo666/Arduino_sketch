@@ -20,6 +20,8 @@ float Kd=2.0;
 
 float r_Target = 0.0;
 float l_Target = 0.0;
+float r_data;
+float l_data;
 float r_last_data = 0.0;
 float l_last_data = 0.0;
 
@@ -76,10 +78,10 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  msg.r_data=(float)r_encoderCnt/(12*250)*100*60;
-  msg.l_data=(float)l_encoderCnt/(12*250)*100*60;
-  msg.r_data=0.01*msg.r_data+(1-0.01)*r_last_data;
-  msg.l_data=0.01*msg.l_data+(1-0.01)*l_last_data;  
+  r_data=(float)r_encoderCnt/(12*250)*100*60;
+  l_data=(float)l_encoderCnt/(12*250)*100*60;
+  r_data=0.01*r_data+(1-0.01)*r_last_data;
+  l_data=0.01*l_data+(1-0.01)*l_last_data;  
   msg.time=(micros()-startTime)/1000000;
 
   R_PID();
@@ -89,15 +91,26 @@ void loop(){
   analogWrite(l_motor_pwm, abs(l_duty));
 
   i++;
-  if(i==10){
+  if(i==5){
+    if(r_encoderCnt==0){
+      msg.r_data=0.0;
+    }else{
+      msg.r_data=r_data;
+    }
+    
+    if(l_encoderCnt==0){
+      msg.l_data=0.0;
+    }else{
+      msg.l_data=l_data;
+    }
     chatter.publish(&msg);
     i=0;
     }
     
   r_encoderCnt=0;
   l_encoderCnt=0;
-  r_last_data=msg.r_data;
-  l_last_data=msg.l_data;
+  r_last_data=r_data;
+  l_last_data=l_data;
  
 
   nh.spinOnce();
@@ -108,7 +121,7 @@ void loop(){
 void R_PID(){
   r_dt = (micros() - r_preTime) / 1000000;
   r_preTime = micros();
-  r_P  = r_Target - abs(msg.r_data);
+  r_P  = r_Target - abs(r_data);
   //r_I += (r_P + r_preP)* r_dt;
   r_D  = (r_P - r_preP) / r_dt;
   r_preP = r_P;
@@ -124,7 +137,7 @@ void R_PID(){
 void L_PID(){
   l_dt = (micros() - l_preTime) / 1000000;
   l_preTime = micros();
-  l_P  = l_Target - abs(msg.l_data);
+  l_P  = l_Target - abs(l_data);
   //r_I += (r_P + r_preP)* r_dt;
   l_D  = (l_P - l_preP) / l_dt;
   l_preP = l_P;

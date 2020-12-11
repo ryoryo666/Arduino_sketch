@@ -11,7 +11,7 @@
 #define IN2 13
 
 int gear=250;
-int duty=10;
+int duty=0;
 volatile int r_encoderCnt=0;
 volatile int l_encoderCnt=0;
 
