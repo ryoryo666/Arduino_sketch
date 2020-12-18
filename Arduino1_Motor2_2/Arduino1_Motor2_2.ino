@@ -14,7 +14,7 @@
 
 
 //Parameter
-float Kp=6.0;
+float Kp=3.0;
 //float Ki=0.0;
 float Kd=2.0;
 
@@ -78,8 +78,8 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  r_data=(float)r_encoderCnt/(12*250)*100*60;
-  l_data=(float)l_encoderCnt/(12*250)*100*60;
+  r_data=(float)r_encoderCnt/(6*250)*100*60;
+  l_data=(float)l_encoderCnt/(6*250)*100*60;
   r_data=0.01*r_data+(1-0.01)*r_last_data;
   l_data=0.01*l_data+(1-0.01)*l_last_data;  
   msg.time=(micros()-startTime)/1000000;
@@ -91,7 +91,7 @@ void loop(){
   analogWrite(l_motor_pwm, abs(l_duty));
 
   i++;
-  if(i==5){
+  if(i==10){
     if(r_encoderCnt==0){
       msg.r_data=0.0;
     }else{
