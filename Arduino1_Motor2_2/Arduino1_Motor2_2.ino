@@ -1,6 +1,6 @@
 #include <ros.h>
-#include <two_wheel/RPM2_Time.h>
-#include <two_wheel/target_curve.h>
+#include <two_wheel/RL_RPM.h>
+#include <two_wheel/RightLeft_cmd_value.h>
 
 //Pin number
 #define R_encoderA 2
@@ -36,20 +36,20 @@ volatile int l_encoderCnt=0;
 
 ros::NodeHandle nh;
 //  Subscriber setting
-void messageCb(const two_wheel::target_curve& new_target){
-  r_Target=new_target.r_target;
-  l_Target=new_target.l_target;
+void messageCb(const two_wheel::RightLeft_cmd_value& new_target){
+  r_Target=new_target.r_ref;
+  l_Target=new_target.l_ref;
   if(r_Target < 0 && l_Target < 0){
     CCW();
   }else{
     CW();
   }
 }
-ros::Subscriber<two_wheel::target_curve> sub("target_update", messageCb);
+ros::Subscriber<two_wheel::RightLeft_cmd_value> sub("New_cmd", messageCb);
 
 
 //  Publisher setting
-two_wheel::RPM2_Time msg;
+two_wheel::RL_RPM msg;
 ros::Publisher chatter("rpm_data", &msg);
 
 void setup(){
@@ -82,7 +82,6 @@ void loop(){
   l_data=(float)l_encoderCnt/(6*250)*100*60;
   r_data=0.01*r_data+(1-0.01)*r_last_data;
   l_data=0.01*l_data+(1-0.01)*l_last_data;  
-  msg.time=(micros()-startTime)/1000000;
 
   R_PID();
   L_PID();
