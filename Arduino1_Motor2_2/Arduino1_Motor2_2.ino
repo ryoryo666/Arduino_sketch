@@ -102,7 +102,7 @@ void loop(){
     }else{
       msg.l_data=l_data;
     }
-    chatter.publish(&msg);
+    chatter.publish(&msg);  // 10Hz Publish
     i=0;
     }
     
