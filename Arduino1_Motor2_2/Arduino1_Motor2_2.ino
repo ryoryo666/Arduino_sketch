@@ -90,7 +90,7 @@ void loop(){
   analogWrite(l_motor_pwm, abs(l_duty));
 
   i++;
-  if(i==10){
+  if(i==1){
     if(r_encoderCnt==0){
       msg.r_data=0.0;
     }else{
