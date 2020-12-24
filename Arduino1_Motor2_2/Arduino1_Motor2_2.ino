@@ -14,7 +14,7 @@
 
 
 //Parameter
-float Kp=3.0;
+float Kp=6.0;
 //float Ki=0.0;
 float Kd=2.0;
 
@@ -90,7 +90,7 @@ void loop(){
   analogWrite(l_motor_pwm, abs(l_duty));
 
   i++;
-  if(i==1){
+  if(i==5){
     if(r_encoderCnt==0){
       msg.r_data=0.0;
     }else{
@@ -102,7 +102,7 @@ void loop(){
     }else{
       msg.l_data=l_data;
     }
-    chatter.publish(&msg);  // 10Hz Publish
+    chatter.publish(&msg);  // 20Hz Publish
     i=0;
     }
     
