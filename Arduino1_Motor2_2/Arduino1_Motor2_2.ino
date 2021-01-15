@@ -14,9 +14,9 @@
 
 
 //Parameter
-float Kp=6.0;
+float Kp=1.0;
 //float Ki=0.0;
-float Kd=4.0;
+float Kd=0.75;
 
 float r_Target = 0.0;
 float l_Target = 0.0;
@@ -43,7 +43,7 @@ void messageCb(const two_wheel::RightLeft_cmd_value& new_target){
     CCW();
   }else if(r_Target > 0 && l_Target > 0){
     CW();
-  }else if(r_Target == 0 && l_Target == 0){
+  }else if(r_Target == 0 || l_Target == 0){
     STOP();
   }
 }

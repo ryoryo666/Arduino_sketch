@@ -2,17 +2,17 @@
 #define R_encoderA 2
 #define R_encoderB 4
 #define L_encoderA 3
-#define L_encoderB 5
-#define r_motor_pwm 11
+#define L_encoderB 7
+#define r_motor_pwm 5
 #define l_motor_pwm 6
 #define IN1 12
 #define IN2 13
 
 
 //Parameter
-float Kp=10.0;
+float Kp=6.0;
 //float Ki=0.0;
-float Kd=5.0;
+float Kd=4.0;
 
 float r_Target = 10.0;
 float l_Target = 10.0;
@@ -56,8 +56,8 @@ void setup(){
 void loop(){
   static int i=0;
   static float startTime=micros();
-  r_data=(float)r_encoderCnt/(6*250)*100*60;
-  l_data=(float)l_encoderCnt/(6*250)*100*60;
+  r_data=(float)r_encoderCnt/1500*200*60;
+  l_data=(float)l_encoderCnt/1500*200*60;
   r_data=0.01*r_data+(1-0.01)*r_last_data;
   l_data=0.01*l_data+(1-0.01)*l_last_data;  
 
@@ -66,16 +66,20 @@ void loop(){
 
   analogWrite(r_motor_pwm, abs(r_duty));
   analogWrite(l_motor_pwm, abs(l_duty));
-  Serial.print(l_data);
-  Serial.print("\t");
-  Serial.println(r_data);
-  Serial.print("\n");
+  if(i==5){
+    Serial.print(l_data);
+    Serial.print("\t");
+    Serial.println(r_data);
+    Serial.print("\n");
+    i=0;
+  }
     
   r_encoderCnt=0;
   l_encoderCnt=0;
   r_last_data=r_data;
   l_last_data=l_data;
- 
+
+  i++;
   last_Time=micros();
   delay(5);
 }
