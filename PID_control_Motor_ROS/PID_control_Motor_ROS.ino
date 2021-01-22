@@ -35,7 +35,7 @@ ros::Subscriber<std_msgs::Float32> sub("target_update", &messageCb);
 
 //  Publisher setting
 two_wheel::RPM1_Time msg;
-ros::Publisher chatter("rpm_data", &msg);
+ros::Publisher chatter("Encoder_data", &msg);
 
 void setup(){
   pinMode(encoderA, INPUT);

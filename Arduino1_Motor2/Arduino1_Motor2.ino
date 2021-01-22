@@ -48,7 +48,7 @@ ros::Subscriber<two_wheel::RightLeft_cmd_value> sub("New_cmd", messageCb);
 
 //  Publisher setting
 two_wheel::RPM2_Time msg;
-ros::Publisher chatter("rpm_data", &msg);
+ros::Publisher chatter("Encoder_data", &msg);
 
 void setup(){
   pinMode(R_encoderA, INPUT);
